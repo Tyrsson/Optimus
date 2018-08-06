@@ -19,7 +19,8 @@ class OptimusSitemap
 {
 	private $t     = "\t";
 	private $n     = "\n";
-	private $xmlns = 'https://www.sitemaps.org/schemas/sitemap/0.9';
+	private $count = 50000;
+	private $xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9';
 
 	private $custom_links = array();
 
@@ -206,9 +207,9 @@ class OptimusSitemap
 			$one_file .= $this->t . '</url>' . $this->n;
 		}
 
-		// Создаем карту сайта (если ссылок больше 10к, то делаем файл индекса)
+		// Создаем карту сайта (если ссылок больше $this->count, то делаем файл индекса)
 		$header = '<' . '?xml version="1.0" encoding="UTF-8"?>' . "\n";
-		if (count($url_list) > 10000) {
+		if (count($url_list) > $this->count) {
 			$base_entries = $header . '<urlset xmlns="' . $this->xmlns . '">' . $this->n . $base_entries . '</urlset>';
 			$sitemap = ROOT_DIR . '/sitemap_main.xml';
 			self::createFile($sitemap, $base_entries);
@@ -224,10 +225,10 @@ class OptimusSitemap
 			$maps .= $this->t . '<sitemap>' . $this->n;
 			$maps .= $this->t . $this->t . '<loc>' . $boardurl . '/sitemap_main.xml</loc>' . $this->n;
 			$maps .= $this->t . $this->t . '<lastmod>' . self::getSitemapDate() . '</lastmod>' . $this->n;
-			$maps .= $t . '</sitemap>' . $this->n;
+			$maps .= $this->t . '</sitemap>' . $this->n;
 
 			foreach ($files as $year) {
-				$maps .= $t . '<sitemap>' . $this->n;
+				$maps .= $this->t . '<sitemap>' . $this->n;
 				$maps .= $this->t . $this->t . '<loc>' . $boardurl . '/sitemap_' . $year . '.xml</loc>' . $this->n;
 				$maps .= $this->t . $this->t . '<lastmod>' . self::getSitemapDate() . '</lastmod>' . $this->n;
 				$maps .= $this->t . '</sitemap>' . $this->n;
@@ -280,7 +281,7 @@ class OptimusSitemap
 	 * @param int $timestamp
 	 * @return string
 	 */
-	private static function getSitemapDate($timestamp)
+	private static function getSitemapDate($timestamp = 0)
 	{
 		$timestamp = empty($timestamp) ? time() : $timestamp;
 		$gmt       = substr(date("O", $timestamp), 0, 3) . ':00';
